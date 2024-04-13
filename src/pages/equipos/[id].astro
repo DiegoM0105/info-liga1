@@ -1,0 +1,68 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import PartidoClubs from '../../components/PartidoClubs.astro'
+import Jugadores from '../../components/Jugadores.astro'
+import { supabase } from '../../lib/supabase' 
+
+const { id } = Astro.params
+
+let { data: jugador, error } = await supabase.from('jugador').select('JUG_NOMBRE, JUG_NACION').eq("JUG_EQUIPO", id)
+let { data: partido } = await supabase.rpc('get_partidos_club', { id: id })
+---
+<Layout title=`Información de club | Liga 1 Foro`>
+    <section class="p-5 flex flex-col justify-center items-start gap-5 md:flex-row">
+        <div class="">
+            <strong class="text-2xl">Lista de jugadores</strong>
+            <div class="flex justify-center items-center">
+                <table class="table-auto bg-[#f5f5f5] border-collapse border-separate border-spacing-3 border border-slate-300 p-3">
+                    <thead>
+                        <tr>
+                            <th class="text-center">Nombre</th>
+                            <th class="text-center">Nacionalidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {
+                            jugador?.map(data => 
+                                <tr>
+                                    <Jugadores nombre={data.JUG_NOMBRE} nacion={data.JUG_NACION}/>
+                                </tr>
+                            )
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="">
+            <strong class="text-2xl">Resultados del torneo</strong>
+            <table class="table-auto bg-[#f5f5f5] border-collapse border border-white-900 border-separate border-spacing-y-3 p-3">
+                <thead>
+                    <tr>
+                        <th class="text-center">L/V</th>
+                        <th class="text-center">Rival</th>
+                        <th class="text-center">Resultado</th>
+                        <th class="text-center hidden md:block">Fecha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {
+                        partido?.map((data : any) => 
+                            (data.PAR_RESULTADO == id) && (data.PAR_LOCAL == id) ? <PartidoClubs modalidad='L' color="bg-green-300" id={data.PAR_ID} gol_local={data.PAR_GOL_LOCAL} gol_visita={data.PAR_GOL_VISITA} equipo={data.VISITA} eqp_img={data.VISITA_IMG} fecha={data.PAR_FECHA}/> : 
+
+                            (data.PAR_RESULTADO == id) && (data.PAR_VISITA == id) ? <PartidoClubs modalidad='V' color="bg-green-300" id={data.PAR_ID} gol_local={data.PAR_GOL_LOCAL} gol_visita={data.PAR_GOL_VISITA} equipo={data.LOCAL} eqp_img={data.LOCAL_IMG} fecha={data.PAR_FECHA}/> :
+
+                            (data.PAR_RESULTADO == "900" && (data.PAR_LOCAL == id)) ? <PartidoClubs modalidad='L' color="bg-yellow-200" id={data.PAR_ID} gol_local={data.PAR_GOL_LOCAL} gol_visita={data.PAR_GOL_VISITA} equipo={data.VISITA} eqp_img={data.VISITA_IMG} fecha={data.PAR_FECHA}/> : 
+
+                            (data.PAR_RESULTADO == "900" && (data.PAR_VISITA == id)) ? <PartidoClubs modalidad='V' color="bg-yellow-200" id={data.PAR_ID} gol_local={data.PAR_GOL_LOCAL} gol_visita={data.PAR_GOL_VISITA} equipo={data.LOCAL} eqp_img={data.LOCAL_IMG} fecha={data.PAR_FECHA}/> :
+
+                            (data.PAR_LOCAL == id) ? <PartidoClubs modalidad='L' color="bg-red-200" id={data.PAR_ID} gol_local={data.PAR_GOL_LOCAL} gol_visita={data.PAR_GOL_VISITA} equipo={data.VISITA} eqp_img={data.VISITA_IMG} fecha={data.PAR_FECHA}/> :
+
+                            <PartidoClubs modalidad='V' color="bg-red-200" id={data.PAR_ID} gol_local={data.PAR_GOL_LOCAL} gol_visita={data.PAR_GOL_VISITA} equipo={data.LOCAL} eqp_img={data.LOCAL_IMG} fecha={data.PAR_FECHA}/>
+                        )
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</Layout>

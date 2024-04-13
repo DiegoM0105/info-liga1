@@ -1,0 +1,55 @@
+---
+import { supabase } from "../../lib/supabase";
+const { data:equipo, error } = await supabase.from('equipo').select('EQP_ID, EQP_NOMBRE')
+const { data:temporada } = await supabase.from('temporada').select('TEMP_ID, TEMP_ANIO')
+const { data:fecha } = await supabase.from('fecha').select('FECH_ID, FECH_NOMBRE')
+---
+<form action="../../api/partido" method="post">
+    <div class="bg-[#f5f5f5] w-92 gap-3 p-5 rounded rounded-md my-1 flex flex-col justify-center items-center">
+        <div class="">
+            <select name="inputTemporada" class="p-3 outline-none border border-gray-400 rounded rounded-md">
+                {
+                    temporada?.map(data => 
+                        <option value={data.TEMP_ID}>{data.TEMP_ANIO}</option>
+                    )
+                }
+            </select>
+
+            <select name="inputFechaFut" class="p-3 outline-none border border-gray-400 rounded rounded-md">
+                {
+                    fecha?.map(data => 
+                        <option value={data.FECH_ID}>{data.FECH_NOMBRE}</option>
+                    )
+                }
+            </select>
+
+            <input class="rounded rounded-md p-3 outline-none border border-gray-400" type="date" name="inputFecha" lang="en">
+        </div>
+        <div class="flex flex-col gap-2 md:flex-row">
+            <select name="inputLocal" class="p-3 outline-none border border-gray-400 rounded rounded-md">
+                {
+                    equipo?.map(data => 
+                        <option value={data.EQP_ID}>{data.EQP_NOMBRE}</option>
+                    )
+                }
+            </select>
+
+            <div class="flex flex-col justify-center items-center gap-1 md:flex-row">
+                <input type="number" name="inputGolLocal" id="inputGolLocal" class="rounded rounded-md w-24 p-3 outline-none border border-gray-400" min="0">
+                <strong>-</strong>
+                <input type="number" name="inputGolVisita" id="inputGolVisita" class="rounded rounded-md w-24 p-3 outline-none border border-gray-400" min="0">
+            </div>
+
+            <select name="inputVisita" class="p-3 outline-none border border-gray-400 rounded rounded-md">
+                {
+                    equipo?.map(data => 
+                        <option value={data.EQP_ID}>{data.EQP_NOMBRE}</option>
+                    )
+                }
+            </select>
+        </div>
+        <div class="w-full">
+            <input class="w-full outline-none p-2 rounded rounded-md bg-blue-600 text-white cursor-pointer transition-all animation-200 hover:bg-blue-800" type="submit" value="REGISTRAR">
+        </div>
+    </div>
+</form>

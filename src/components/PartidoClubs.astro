@@ -1,0 +1,31 @@
+---
+interface Props {
+	id: string;
+    modalidad: string;
+    eqp_img: string;
+    equipo: string;
+    gol_local: string;
+    gol_visita: string;
+    fecha: Date;
+    color: string
+}
+const { id, color, modalidad, equipo, eqp_img, gol_local, gol_visita, fecha } = Astro.props;
+const date = new Date(fecha + 'T00:00:00-05:00').toLocaleDateString('pe-PE');
+---
+<tr class=`${color} border border-white-900`>
+    <td class="text-center">
+        <span>{modalidad}</span>
+    </td>
+    <td class="flex flex-row justify-center items-center gap-1">
+        <div class="w-[10px] h-[30px] flex flex-row justify-center items-center">
+            <img src={`../../src/img/clubs/${eqp_img}`} alt="">
+        </div>
+        <span>{equipo}</span>
+    </td>
+    <td class="text-center">
+        <strong class="text-sm">{gol_local} - {gol_visita}</strong>
+    </td>
+    <td class="text-center hidden md:block">
+        <span>{date}</span>
+    </td>
+</tr>

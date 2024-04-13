@@ -1,0 +1,33 @@
+---
+interface Props {
+    i: number;
+    equipo: string;
+    eqp_img: string;
+    pg: number;
+    pe: number;
+    pp: number;
+    gf: number;
+    gc: number;
+    dif: number;
+}
+
+const { i, equipo, eqp_img, pg, pe, pp, gf, gc, dif} = Astro.props;
+
+---
+<tr class={i > 15 ? 'border border-gray-200 bg-red-200' : 'border border-gray-200'}>
+    <td class="px-4 py-2 text-center">{i+1}</td>
+    <td class="px-4 py-2 flex flex-row justify-start items-center gap-2">
+        <div class="w-[20px]">
+            <img src={`/src/img/clubs/${eqp_img}`} alt="">
+        </div>
+        <span>{equipo}</span>
+    </td>
+    <td class="px-4 py-2 text-center">{pg*3 + pe}</td>
+    <td class="px-4 py-2 text-center">{pg + pe + pp}</td>
+    <td class="px-4 py-2 text-center">{pg}</td>
+    <td class="px-4 py-2 text-center">{pe}</td>
+    <td class="px-4 py-2 text-center">{pp}</td>
+    <td class="px-4 py-2 text-center">{gf}</td>
+    <td class="px-4 py-2 text-center">{gc}</td>
+    <td class="px-4 py-2 text-center">{dif}</td>
+</tr>

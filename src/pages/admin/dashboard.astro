@@ -1,0 +1,109 @@
+---
+import LayoutAdmin from "../../layouts/LayoutAdmin.astro";
+import FormPartido from "../../components/admin/FormPartido.astro";
+import PartidoPendiente from "../../components/admin/PartidoPendiente.astro";
+import { supabase } from '../../lib/supabase'
+
+const { data:pendiente, error } = await supabase.rpc("get_partidos_pendientes")
+---
+<LayoutAdmin title="Dashboard de admin | Liga 1 Foro">
+    <section class="min-h-screen p-5">
+        <strong class="text-2xl">Registro de partido</strong>
+
+        <FormPartido/>
+        <hr class="my-5">
+
+        <strong class="text-2xl">Partidos pendientes</strong>
+
+        <section class="grid grid-cols-1 gap-3 md:grid-cols-3">
+          {
+            pendiente.map((data : any) => 
+              <PartidoPendiente id={data.PAR_ID} local={data.EQP_LOCAL} local_img={data.EQP_LOCAL_IMG} visita={data.EQP_VISITA} visita_img={data.EQP_VISITA_IMG} id_local={data.PAR_LOCAL} id_visita={data.PAR_VISITA} resultado={data.PAR_RESULTADO} fecha={data.PAR_FECHA} fecha_fut={data.PAR_FECHA_FUT}/>
+            )
+          }
+        </section>
+
+        <!-- <div id="tabla-container"></div> -->
+    </section>
+</LayoutAdmin>
+
+<!-- <script is:inline>
+    // Hacer una solicitud HTTP para obtener la página HTML
+fetch('https://www.futbolenvivoperu.com/competicion/primera-division-peru/posiciones')
+.then(response => response.text()) // Obtener el contenido de la página como texto
+  .then(html => {
+    // Crear un objeto DOM para manipular el HTML
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    
+    // Extraer los elementos tr de la tabla (ejemplo: obtener todos los elementos tr de una tabla con id "tabla-posiciones")
+    const filas = doc.querySelectorAll('#tblClasificacion tr:not(.cabeceraTabla):not(.subcabeceraResultados)');
+    
+    // Crear un array para almacenar los datos de las filas
+    const datos = [];
+    
+    // Iterar sobre las filas y extraer los datos
+    filas.forEach(fila => {
+        // Crear un array para almacenar los datos de la fila
+        const datosFila = [];
+        
+        // Obtener las celdas de la fila y extraer el texto de cada celda
+        const celdas = fila.querySelectorAll('td');
+        celdas.forEach(celda => {
+            datosFila.push(celda.innerText);
+        });
+        
+        // Agregar los datos de la fila al array de datos
+        datos.push(datosFila);
+    });
+    
+    // Formatear los datos como JSON
+    const datosJSON = JSON.stringify(datos);
+  
+    // Crear la estructura HTML de la tabla
+    const tablaHTML = `<table class="table-auto border border-white bg-white">
+        <thead class="bg-gray-200">
+          <tr>
+            <th>#</th>
+            <th>Equipo</th>
+            <th>Puntos</th>
+            <th>PJ</th>
+            <th>DIF</th>
+            <th>PG</th>
+            <th>PE</th>
+            <th>PP</th>
+            <th>GF</th>
+            <th>GC</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${datos.map(fila => `
+            <tr class="border border-gray-200">
+                <td class="px-4 py-2 text-center">${fila[0]}</td>
+                <td class="px-4 py-2 text-center">
+                    <div class="w-[20px]">
+                        <img src="/src/img/clubs/${fila[1].toLowerCase().replace(/\s+/g, '-').replace(/^-+|-+$/g, '')}.png" alt="Escudo de ${fila[1]}">
+                    </div>
+                    ${fila[1]}
+                </td>
+                <td class="px-4 py-2 text-center">${fila[2]}</td>
+                <td class="px-4 py-2 text-center">${fila[3]}</td>
+                <td class="px-4 py-2 text-center">${fila[4]}</td>
+                <td class="px-4 py-2 text-center">${fila[5]}</td>
+                <td class="px-4 py-2 text-center">${fila[6]}</td>
+                <td class="px-4 py-2 text-center">${fila[7]}</td>
+                <td class="px-4 py-2 text-center">${fila[8]}</td>
+                <td class="px-4 py-2 text-center">${fila[9]}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>`;
+    
+    // Agregar la tabla al DOM
+    document.getElementById('tabla-container').innerHTML = tablaHTML;
+  })
+  .catch(error => {
+    console.error('Error al obtener la página:', error);
+  });
+
+</script> -->

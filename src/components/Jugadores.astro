@@ -1,0 +1,16 @@
+---
+interface Props {
+	nombre: string;
+    nacion: string;
+}
+const { nombre, nacion} = Astro.props;
+---
+<td class="h-5 text-center">
+    <span>{nombre}</span>
+</td>
+<td class="h-8 flex flex-row justify-center items-center gap-2">
+    <img src={`/src/img/flags/${nacion[0]}.png`} alt=""> 
+    {
+        nacion[1] ? <img src={`/src/img/flags/${nacion[1]}.png`} alt=""> : <span class="hidden">-</span>
+    }
+</td>

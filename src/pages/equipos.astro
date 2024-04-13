@@ -1,0 +1,15 @@
+---
+import Layout from '../layouts/Layout.astro'
+import ClubCard from '../components/ClubCard.astro'
+
+import { supabase } from '../lib/supabase.ts' 
+let { data: equipo, error } = await supabase.from('equipo').select('EQP_ID, EQP_NOMBRE, EQP_IMG')
+---
+
+<Layout title='Equipos de la Liga 1 | Liga1 Foro Web'>
+    <section class="min-h-screen p-5 grid grid-cols-1 gap-3 md:grid-cols-3 xl:grid-cols-4">
+        {
+            equipo?.map(data => <ClubCard nombre={data.EQP_NOMBRE} id={data.EQP_ID} img={data.EQP_IMG}/>)
+        }
+    </section>
+</Layout>

@@ -1,0 +1,127 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PartidoCard from '../components/PartidoCard.astro';
+import PartidoHoy from '../components/PartidoHoy.astro'
+import NoPartido from '../components/NoPartido.astro'
+import TablaLiga from '../components/TablaLiga.astro'
+
+import { supabase } from '../lib/supabase.ts' 
+
+let date = new Date().toLocaleDateString('en-us')
+const { data: hoy } = await supabase.rpc('get_partidos').eq('PAR_FECHA', date)
+const cantidad = hoy.length
+console.log(date)
+const { data:tabla } = await supabase.rpc('get_tabla')
+
+const { data:partido } = await supabase.rpc('get_partidos').order('PAR_ID', { ascending: true }).order('PAR_FECHA', {ascending:true})
+---
+<Layout title="Info Liga 1">
+	<main class="p-5">
+		<strong class="text-2xl">Tabla de posiciones</strong>
+		<section class="flex flex-col justify-center items-center">
+			<table class="table-auto border border-white bg-white">
+				<thead class="bg-gray-200">
+					<tr>
+						<th>#</th>
+						<th>Equipo</th>
+						<th>Pts</th>
+						<th class="">PJ</th>
+						<th>PG</th>
+						<th>PE</th>
+						<th>PP</th>
+						<th class="">GF</th>
+						<th class="">GC</th>
+						<th class="">DIF</th>
+					</tr>
+				</thead>
+				<tbody>
+					{
+						tabla.map((data : any, index: any) => 
+							<TablaLiga i={index} eqp_img={data.EQP_IMG} equipo={data.EQUIPO} pg={data.PG} pe={data.PE} pp={data.PP} gf={data.GF} gc={data.GC} dif={data.DIF}/>
+						)
+					}
+				</tbody>
+			</table>
+		</section>
+
+		<hr class="my-5">
+		{
+			hoy != "" ? <div>
+				{
+					cantidad > 1 ? <strong class="text-2xl">Partidos de hoy</strong> : <strong class="text-2xl">Partido de hoy</strong>
+				}
+				{
+					hoy.map((data : any) => 
+						<PartidoHoy id={data.PAR_ID} gol_local={data.PAR_GOL_LOCAL} gol_visita={data.PAR_GOL_VISITA}  fecha_fut={data.PAR_FECHA_FUT} local={data.LOCAL} visita={data.VISITA} temp={data.PAR_TEMP} visita_img={data.VISITA_IMG} local_img={data.LOCAL_IMG}/>	
+					)
+				}
+			</div> : <NoPartido/> 
+		}
+		<hr class="my-5"> 
+
+		<div id="pagination" class="my-5"></div>
+		
+		<section class="min-h-screen">
+			<ul class="grid grid-cols-1 gap-3 md:grid-cols-3" id="container">
+				{
+					partido?.map((data : any) => 
+						<PartidoCard id={data.PAR_ID} gol_local={data.PAR_GOL_LOCAL} gol_visita={data.PAR_GOL_VISITA} fecha={data.PAR_FECHA} fecha_fut={data.PAR_FECHA_FUT} local={data.LOCAL} visita={data.VISITA} temp={data.PAR_TEMP} visita_img={data.VISITA_IMG} local_img={data.LOCAL_IMG}/>	
+					)
+				}
+			</ul>
+		</section>
+	</main>
+</Layout>
+
+<script is:inline>
+// Función para generar las opciones del select
+	function generateOptions() {
+		const items = document.querySelectorAll('.item');
+		const totalItems = items.length; // Cantidad total de elementos
+		const itemsPerPage = 9; // Elementos por página
+		const totalPages = Math.ceil(totalItems / itemsPerPage); // Total de páginas
+
+		let options = '';
+		for (let i = 0; i < totalPages; i++) {
+				const startItem = i + 1;
+				options += `<option value="${i}">Fecha ${startItem}</option>`;
+			}
+			return options;
+	}
+
+	// Función para mostrar los elementos de la página seleccionada
+	function showPage(page) {
+		const items = document.querySelectorAll('.item');
+		const itemsPerPage = 9; // Elementos por página
+		const startIndex = page * itemsPerPage;
+		const endIndex = Math.min(startIndex + itemsPerPage, items.length);
+
+		items.forEach((item, index) => {
+			if (index >= startIndex && index < endIndex) {
+					item.style.display = 'block'; // Mostrar elemento
+					} else {
+					item.style.display = 'none'; // Ocultar elemento
+				}
+			});
+		}
+
+	// Función para manejar el cambio de página
+	function onPageChange() {
+		const select = document.getElementById('pageSelect');
+		const selectedPage = parseInt(select.value);
+		showPage(selectedPage);
+	}
+
+	// Crear el elemento select y agregar opciones
+	const paginationDiv = document.getElementById('pagination');
+	paginationDiv.innerHTML = `
+		<select class="bg-white-300 p-3 rounded rounded-md" id="pageSelect" onchange="onPageChange()">
+			${generateOptions()}
+		</select>
+	`;
+	
+	// Seleccionar automáticamente la última opción y mostrar su contenido
+	const select = document.getElementById('pageSelect');
+	select.selectedIndex = select.options.length - 1;
+	onPageChange(); // Mostrar el contenido de la última página al cargar la página
+</script>
